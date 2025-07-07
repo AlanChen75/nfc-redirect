@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>NFC Redirect</title>
+</head>
+<body>
+  <p>🔄 轉址中，請稍候...</p>
+  <script>
+    const id = new URLSearchParams(window.location.search).get("id");
+    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLmgY4rFS7K6InfaiO837OfhejcmixjJT-W6z4-zmxeofutmOKCMhTSbQHhxBLlgl_mpJ16jZ1-P87/pub?output=csv";
+
+    fetch(sheetUrl)
+      .then(res => res.text())
+      .then(text => {
+        const rows = text.trim().split("\n").map(row => row.split(","));
+        const header = rows[0];
+        const dataRow = rows.find(row => row[0] === id);
+        const activeCol = 3; // 例如對應到 Link3（手動修改即可）
+
+        if (dataRow && dataRow[activeCol]) {
+          window.location.href = dataRow[activeCol];
+        } else {
+          document.body.innerHTML = "❌ 找不到對應資料";
+        }
+      });
+  </script>
+</body>
+</html>
