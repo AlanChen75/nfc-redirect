@@ -8,8 +8,8 @@
   <p>🔄 轉址中，請稍候...</p>
   <script>
     const id = new URLSearchParams(window.location.search).get("id");
-    const sheetID = "1YUaLm1kp87H8OGgCTkv6Hz_XqnXgJqEBSuUvGOjY9FQ";  // 你的 Google Sheet ID
-    const sheetName = "連結表"; // 工作表名稱
+    const sheetID = "1YUaLm1kp87H8OGgCTkv6Hz_XqnXgJqEBSuUvGOjY9FQ";  // Google Sheet ID
+    const sheetName = "data"; // ✅ 改為英文工作表名稱
     const activeCol = 2; // Link1 對應 index = 2
 
     const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
@@ -17,12 +17,9 @@
     fetch(url)
       .then(res => res.text())
       .then(text => {
-        // 移除不必要的前綴與後綴取得 JSON
         const json = JSON.parse(text.substr(47).slice(0, -2));
         const rows = json.table.rows;
-
         const data = rows.map(r => r.c.map(c => (c ? c.v : "")));
-
         const dataRow = data.find(row => row[0] === id);
 
         if (dataRow && dataRow[activeCol]) {
