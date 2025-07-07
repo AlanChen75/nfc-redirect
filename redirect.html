@@ -8,31 +8,31 @@
   <p>🔄 轉址中，請稍候...</p>
   <script>
     const id = new URLSearchParams(window.location.search).get("id");
-    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLmgY4rFS7K6InfaiO837OfhejcmixjJT-W6z4-zmxeofutmOKCMhTSbQHhxBLlgl_mpJ16jZ1-P87/pub?output=csv";
-    const activeCol = 2; // 對應 Link1（index 2）
+    const sheetID = "1YUaLm1kp87H8OGgCTkv6Hz_XqnXgJqEBSuUvGOjY9FQ";  // 你的 Google Sheet ID
+    const sheetName = "連結表"; // 工作表名稱
+    const activeCol = 2; // Link1 對應 index = 2
 
-    fetch(sheetUrl)
+    const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
+
+    fetch(url)
       .then(res => res.text())
       .then(text => {
-        const rows = text.trim().split("\n").map(row => row.split(","));
+        // 移除不必要的前綴與後綴取得 JSON
+        const json = JSON.parse(text.substr(47).slice(0, -2));
+        const rows = json.table.rows;
 
-        // 移除 BOM（只處理第一列第一欄）
-        if (rows[0][0].charCodeAt(0) === 0xFEFF) {
-          rows[0][0] = rows[0][0].substring(1);
-        }
+        const data = rows.map(r => r.c.map(c => (c ? c.v : "")));
 
-        const header = rows[0];
-        const data = rows.slice(1);
-        const dataRow = data.find(row => row[0].trim() === id.trim());
+        const dataRow = data.find(row => row[0] === id);
 
         if (dataRow && dataRow[activeCol]) {
           window.location.href = dataRow[activeCol];
         } else {
-          document.body.innerHTML = "❌ 找不到對應資料或連結為空";
+          document.body.innerHTML = "❌ 找不到對應資料或網址為空";
         }
       })
       .catch(err => {
-        document.body.innerHTML = "⚠️ 無法載入資料：" + err;
+        document.body.innerHTML = "⚠️ 無法讀取 Google Sheet：" + err;
       });
   </script>
 </body>
